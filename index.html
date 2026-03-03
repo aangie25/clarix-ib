@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Clarix IB — IB English Language & Literature</title>
@@ -599,22 +600,32 @@
     }, { threshold: 0.08 });
     reveals.forEach(el => observer.observe(el));
 
-    function handleSubmit(e) {
-      e.preventDefault();
-      const btn = e.target.querySelector(".form-submit");
-      btn.textContent = "Sending...";
-      btn.disabled = true;
-      fetch("/", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(new FormData(e.target)).toString()
-      }).then(() => {
-        btn.textContent = "Sent ✓";
-        btn.style.background = "#3d8aa5";
-        e.target.reset();
-        setTimeout(() => { btn.textContent = "Send Message"; btn.style.background = ""; btn.disabled = false; }, 3000);
-      }).catch(() => { btn.textContent = "Send Message"; btn.disabled = false; });
-    }
+   emailjs.init('YOUR_PUBLIC_KEY');
+
+function handleSubmit(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('.form-submit');
+  const form = e.target;
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+  emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', {
+    from_name:  form.querySelector('[name=first-name]').value + ' ' + form.querySelector('[name=last-name]').value,
+    from_email: form.querySelector('[name=email]').value,
+    school:     form.querySelector('[name=school]').value,
+    grade:      form.querySelector('[name=grade]').value,
+    ib_level:   form.querySelector('[name=ib-level]').value,
+    message:    form.querySelector('[name=message]').value
+  }).then(() => {
+    btn.textContent = 'Sent ✓';
+    btn.style.background = '#3d8aa5';
+    form.reset();
+    setTimeout(() => { btn.textContent = 'Send Message'; btn.style.background = ''; btn.disabled = false; }, 3000);
+  }).catch(() => {
+    btn.textContent = 'Something went wrong — try again';
+    btn.style.background = '#e05555';
+    btn.disabled = false;
+  });
+}
   </script>
 </body>
 </html>
